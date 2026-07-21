@@ -310,6 +310,7 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <Dashboard 
             timetable={timetable} 
+            settings={settings}
             onAddClick={async () => {
               await verifyAdminAction(() => {
                 setEditingClass(null);
@@ -328,6 +329,7 @@ export default function App() {
         {activeTab === 'timetable' && (
           <TimetableGrid 
             timetable={timetable} 
+            settings={settings}
             onAddClick={async () => {
               await verifyAdminAction(() => {
                 setEditingClass(null);

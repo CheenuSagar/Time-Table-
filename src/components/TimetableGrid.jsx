@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, User, PlusCircle, Edit3 } from 'lucide-react';
+import { formatTimeTo12Hr } from '../utils/storageHelper';
 
 const DAYS_OF_WEEK = [
   'Monday',
@@ -16,8 +17,9 @@ function timeToMinutes(timeStr) {
   return h * 60 + m;
 }
 
-export default function TimetableGrid({ timetable, onAddClick, onEditClick }) {
+export default function TimetableGrid({ timetable, settings, onAddClick, onEditClick }) {
   const [selectedDayTab, setSelectedDayTab] = useState('All');
+  const show12h = settings?.timeFormat12h !== false;
 
   // Group classes by day
   const groupedClasses = DAYS_OF_WEEK.reduce((acc, day) => {
@@ -46,7 +48,7 @@ export default function TimetableGrid({ timetable, onAddClick, onEditClick }) {
           
           <div className="card-time-row">
             <Clock size={13} className="card-icon" />
-            <span>{cls.startTime} - {cls.endTime}</span>
+            <span>{show12h ? formatTimeTo12Hr(cls.startTime) : cls.startTime} - {show12h ? formatTimeTo12Hr(cls.endTime) : cls.endTime}</span>
           </div>
 
           {(cls.teacher || cls.location) && (

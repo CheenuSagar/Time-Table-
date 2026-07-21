@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Calendar, MapPin, User, ArrowRight, AlertCircle, PlusCircle, Sparkles, Upload } from 'lucide-react';
+import { formatTimeTo12Hr } from '../utils/storageHelper';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -14,7 +15,7 @@ function minutesToHoursAndMins(mins) {
   return `${h > 0 ? `${h}h ` : ''}${m}m`;
 }
 
-export default function Dashboard({ timetable, onAddClick, onEditClick, onLoadPreset }) {
+export default function Dashboard({ timetable, settings, onAddClick, onEditClick, onLoadPreset }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -24,13 +25,20 @@ export default function Dashboard({ timetable, onAddClick, onEditClick, onLoadPr
     return () => clearInterval(timer);
   }, []);
 
+  const show12h = settings?.timeFormat12h !== false;
+
   const currentDayIndex = currentTime.getDay();
   const currentDay = DAYS[currentDayIndex];
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
   const currentSeconds = currentTime.getSeconds();
 
   // Format Current Time
-  const formattedTime = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const formattedTime = currentTime.toLocaleTimeString([], { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    second: '2-digit',
+    hour12: show12h
+  });
   const formattedDate = currentTime.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
 
   if (timetable.length === 0) {
@@ -201,7 +209,7 @@ export default function Dashboard({ timetable, onAddClick, onEditClick, onLoadPr
                   )}
                 </div>
                 <div className="time-badge-row">
-                  <span className="time-range">{activeClass.startTime} - {activeClass.endTime}</span>
+                  <span className="time-range">{show12h ? formatTimeTo12Hr(activeClass.startTime) : activeClass.startTime} - {show12h ? formatTimeTo12Hr(activeClass.endTime) : activeClass.endTime}</span>
                   <span className="time-remaining">{activeRemaining} mins remaining</span>
                 </div>
                 
@@ -244,7 +252,7 @@ export default function Dashboard({ timetable, onAddClick, onEditClick, onLoadPr
                   )}
                 </div>
                 <div className="next-footer">
-                  <span className="time-range">{nextClass.startTime} - {nextClass.endTime}</span>
+                  <span className="time-range">{show12h ? formatTimeTo12Hr(nextClass.startTime) : nextClass.startTime} - {show12h ? formatTimeTo12Hr(nextClass.endTime) : nextClass.endTime}</span>
                   <div className="countdown-container">
                     <span className="countdown-label">Starts in</span>
                     <span className={`countdown-timer ${isClose ? 'text-warning' : ''}`}>
@@ -289,7 +297,7 @@ export default function Dashboard({ timetable, onAddClick, onEditClick, onLoadPr
                   
                   <div className="timeline-content">
                     <div className="timeline-time" style={{ color: cls.color }}>
-                      {cls.startTime} - {cls.endTime}
+                      {show12h ? formatTimeTo12Hr(cls.startTime) : cls.startTime} - {show12h ? formatTimeTo12Hr(cls.endTime) : cls.endTime}
                     </div>
                     <h4 className="timeline-title">{cls.name}</h4>
                     <div className="timeline-meta">

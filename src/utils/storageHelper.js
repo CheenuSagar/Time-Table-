@@ -12,7 +12,8 @@ const DEFAULT_SETTINGS = {
   soundEnabled: true,
   notificationsEnabled: false,
   preTime: 5, // minutes before lecture
-  alarmSound: 'chime'
+  alarmSound: 'chime',
+  timeFormat12h: true
 };
 
 // Map class object to array elements to save URL length
@@ -1521,3 +1522,22 @@ export function saveGeminiApiKey(key) {
     console.error('Failed to save Gemini API key:', e);
   }
 }
+
+/**
+ * Formats a 24-hour time string "HH:MM" to 12-hour format "h:mm AM/PM"
+ * @param {string} timeStr 
+ * @returns {string}
+ */
+export function formatTimeTo12Hr(timeStr) {
+  if (!timeStr) return '';
+  const parts = timeStr.split(':');
+  if (parts.length < 2) return timeStr;
+  let h = parseInt(parts[0], 10);
+  const m = parts[1];
+  if (isNaN(h)) return timeStr;
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12;
+  h = h ? h : 12;
+  return `${h}:${m} ${ampm}`;
+}
+

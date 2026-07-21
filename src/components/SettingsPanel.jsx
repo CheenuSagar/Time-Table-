@@ -121,6 +121,13 @@ export default function SettingsPanel({
     });
   };
 
+  const handleTimeFormatToggle = () => {
+    onSaveSettings({
+      ...settings,
+      timeFormat12h: !(settings.timeFormat12h !== false)
+    });
+  };
+
   return (
     <div className="settings-grid animate-fade-in">
       {/* Admin Authorization Card */}
@@ -269,6 +276,22 @@ export default function SettingsPanel({
               <option value={10}>10 minutes before</option>
               <option value={15}>15 minutes before</option>
             </select>
+          </div>
+
+          {/* Time Format setting */}
+          <div className="setting-row">
+            <div className="setting-info">
+              <h4>12-Hour Time Format</h4>
+              <p>Display all times in 12-hour format (e.g. 01:10 PM) instead of 24-hour format (e.g. 13:10).</p>
+            </div>
+            <div className="setting-actions">
+              <button 
+                className={`btn btn-sm ${settings.timeFormat12h !== false ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={handleTimeFormatToggle}
+              >
+                {settings.timeFormat12h !== false ? '12-Hour' : '24-Hour'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
