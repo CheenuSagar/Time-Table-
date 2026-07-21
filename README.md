@@ -50,3 +50,4 @@ If you are developing a production application, we recommend using TypeScript wi
 <!-- commit_marker_v2_3 -->
 <!-- commit_marker_v2_4 -->
 <!-- commit_marker_v2_5 -->
+<!-- commit_marker_v2_6 -->
