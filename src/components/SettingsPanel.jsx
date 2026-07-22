@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Bell, Volume2, VolumeX, Download, Share2, Trash2, 
-  Upload, FileText, Check, AlertTriangle, ShieldCheck, Shield, Lock, Unlock
+  Upload, FileText, Check, AlertTriangle, ShieldCheck, Shield, Lock, Unlock, Clock
 } from 'lucide-react';
 import { generateShareUrl, exportBackup } from '../utils/storageHelper';
 import { downloadICSFile } from '../utils/icsHelper';
@@ -96,7 +96,7 @@ export default function SettingsPanel({
         if (Array.isArray(data)) {
           if (confirm(`Do you want to import ${data.length} lectures? This will merge with your current timetable.`)) {
             onImportBackup(data);
-            e.target.value = ''; // Reset file input
+            e.target.value = '';
           }
         } else {
           alert('Invalid backup file format. Expected a timetable JSON array.');
@@ -166,7 +166,7 @@ export default function SettingsPanel({
               </div>
             ) : (
               <div className="setting-actions flex-gap" style={{ alignItems: 'stretch', flexDirection: 'column', width: '100%', maxWidth: '320px', minWidth: '260px' }}>
-                {adminError && <div className="form-error" style={{ width: '100%', margin: '0 0 8px 0', padding: '6px', fontSize: '0.8rem' }}>{adminError}</div>}
+                {adminError && <div className="form-error" style={{ width: '100%', margin: '0 0 8px 0', padding: '6px', fontSize: '0.8rem', color: '#f87171' }}>{adminError}</div>}
                 <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
                   <input 
                     type="password" 
@@ -174,7 +174,7 @@ export default function SettingsPanel({
                     placeholder="Enter admin passcode..."
                     value={adminPasswordInput}
                     onChange={(e) => setAdminPasswordInput(e.target.value)}
-                    style={{ flex: 1, padding: '6px 12px', fontSize: '0.85rem' }}
+                    style={{ flex: 1, padding: '8px 12px', fontSize: '0.88rem' }}
                     onKeyDown={async (e) => {
                       if (e.key === 'Enter') {
                         const success = await onToggleAdmin(true, adminPasswordInput);
@@ -196,7 +196,7 @@ export default function SettingsPanel({
                         setAdminError('Incorrect passcode!');
                       }
                     }}
-                    style={{ padding: '6px 14px', fontSize: '0.85rem' }}
+                    style={{ padding: '8px 16px', fontSize: '0.88rem' }}
                   >
                     Unlock
                   </button>
@@ -218,7 +218,7 @@ export default function SettingsPanel({
           <div className="setting-row">
             <div className="setting-info">
               <h4>Browser Push Notifications</h4>
-              <p>Triggers a browser desktop alert when the app is active in a tab.</p>
+              <p>Triggers a desktop alert when the app is active in your browser.</p>
             </div>
             
             {notificationStatus === 'unsupported' ? (
@@ -241,7 +241,7 @@ export default function SettingsPanel({
           <div className="setting-row">
             <div className="setting-info">
               <h4>Chime Sound Alerts</h4>
-              <p>Plays a clean, synthesizer chime 5 minutes before class starts.</p>
+              <p>Plays a clean, synthesizer chime before class starts.</p>
             </div>
             <div className="setting-actions">
               <button 
@@ -265,10 +265,10 @@ export default function SettingsPanel({
           <div className="setting-row">
             <div className="setting-info">
               <h4>Alert Trigger Time</h4>
-              <p>How many minutes before the lecture start time should we notify you?</p>
+              <p>How many minutes before the lecture start time should alerts sound?</p>
             </div>
             <select 
-              className="form-input select-duration" 
+              className="form-select select-duration" 
               value={settings.preTime}
               onChange={handlePreTimeChange}
             >
@@ -283,14 +283,15 @@ export default function SettingsPanel({
           <div className="setting-row">
             <div className="setting-info">
               <h4>12-Hour Time Format</h4>
-              <p>Display all times in 12-hour format (e.g. 01:10 PM) instead of 24-hour format (e.g. 13:10).</p>
+              <p>Display all class schedules in 12-hour AM/PM format.</p>
             </div>
             <div className="setting-actions">
               <button 
                 className={`btn btn-sm ${settings.timeFormat12h !== false ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={handleTimeFormatToggle}
               >
-                {settings.timeFormat12h !== false ? '12-Hour' : '24-Hour'}
+                <Clock size={14} />
+                {settings.timeFormat12h !== false ? '12-Hour (AM/PM)' : '24-Hour'}
               </button>
             </div>
           </div>
@@ -300,19 +301,17 @@ export default function SettingsPanel({
       {/* Sync and Share (Public Use) Card */}
       <div className="settings-card glass">
         <h3 className="settings-title">
-          <Share2 size={18} className="title-icon" /> Public Sync & Sharing
+          <Share2 size={18} className="title-icon" /> Calendar Sync & Sharing
         </h3>
         
         <div className="settings-body">
           {/* ICS Download */}
           <div className="setting-row">
             <div className="setting-info">
-              <h4>1-Click Calendar Sync (.ics)</h4>
+              <h4>1-Click Calendar Export (.ics)</h4>
               <p>
-                <strong>Recommended for Mobile (iOS & Android)</strong>. Downloads an 
-                iCalendar file with weekly recurring events and automatic 5-minute alerts. 
-                Import it to Google Calendar, Apple Calendar, or Outlook to get reminders 
-                without keeping this browser tab open.
+                <strong>Recommended for Mobile (iOS & Android)</strong>. Export iCalendar file with 
+                weekly recurring lectures for Google Calendar, Apple Calendar, or Outlook.
               </p>
             </div>
             <button 
@@ -320,26 +319,25 @@ export default function SettingsPanel({
               onClick={() => downloadICSFile(timetable)}
               disabled={timetable.length === 0}
             >
-              <Download size={15} /> Sync Calendar
+              <Download size={15} /> Export Calendar (.ics)
             </button>
           </div>
 
           {/* Share Link Generator */}
           <div className="setting-row">
             <div className="setting-info">
-              <h4>Class Sharing Link (Serverless)</h4>
+              <h4>Shareable Schedule Link</h4>
               <p>
-                Generate a URL containing your entire schedule. Share it with your classmates 
-                or post on a class group. When they open it, they will import your timetable instantly!
+                Generates a encoded URL of your timetable so classmates can import your schedule in 1-click.
               </p>
             </div>
             <button 
-              className={`btn btn-sm ${copySuccess ? 'btn-success-solid' : 'btn-secondary'}`}
+              className={`btn btn-sm ${copySuccess ? 'btn-primary' : 'btn-secondary'}`}
               onClick={handleCopyLink}
               disabled={timetable.length === 0}
             >
               {copySuccess ? <Check size={15} /> : <Share2 size={15} />}
-              {copySuccess ? 'Copied Link!' : 'Share Table'}
+              {copySuccess ? 'Copied Link!' : 'Copy Share Link'}
             </button>
           </div>
         </div>
@@ -348,7 +346,7 @@ export default function SettingsPanel({
       {/* Backups & Maintenance */}
       <div className="settings-card glass">
         <h3 className="settings-title">
-          <FileText size={18} className="title-icon" /> Backups & Operations
+          <FileText size={18} className="title-icon" /> Data Backups & Presets
         </h3>
         
         <div className="settings-body">
@@ -356,7 +354,7 @@ export default function SettingsPanel({
           <div className="setting-row">
             <div className="setting-info">
               <h4>Timetable Backups</h4>
-              <p>Export your scheduled classes as a backup file, or upload a JSON backup file to load a saved timetable.</p>
+              <p>Export your scheduled classes as a JSON file, or restore from a previous JSON backup.</p>
             </div>
             <div className="setting-actions flex-gap">
               <button 
@@ -364,11 +362,11 @@ export default function SettingsPanel({
                 onClick={() => exportBackup(timetable)}
                 disabled={timetable.length === 0}
               >
-                <Download size={14} /> Export Backup
+                <Download size={14} /> Export JSON
               </button>
               
               <label className="btn btn-secondary btn-sm file-input-label">
-                <Upload size={14} /> Import Backup
+                <Upload size={14} /> Import JSON
                 <input 
                   type="file" 
                   accept=".json" 
@@ -382,39 +380,39 @@ export default function SettingsPanel({
           {/* Load Preset Schedule */}
           <div className="setting-row">
             <div className="setting-info">
-              <h4>Load Preset Schedule</h4>
-              <p>Reset your timetable to the official ABES MCA III department schedule presets.</p>
+              <h4>Load Department Presets</h4>
+              <p>Reset your schedule to official MCA III section timetable presets.</p>
             </div>
             <div className="setting-actions flex-gap">
               <button 
                 className={`btn ${selectedSection === 'A' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
                 onClick={() => {
-                  if (confirm('Load MCA III-A timetable preset? This will overwrite your current schedule.')) {
+                  if (confirm('Load MCA III-A timetable preset? This will replace your current schedule.')) {
                     onLoadPreset('A');
                   }
                 }}
               >
-                Section A
+                Section III-A
               </button>
               <button 
                 className={`btn ${selectedSection === 'B' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
                 onClick={() => {
-                  if (confirm('Load MCA III-B timetable preset? This will overwrite your current schedule.')) {
+                  if (confirm('Load MCA III-B timetable preset? This will replace your current schedule.')) {
                     onLoadPreset('B');
                   }
                 }}
               >
-                Section B
+                Section III-B
               </button>
               <button 
                 className={`btn ${selectedSection === 'C' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
                 onClick={() => {
-                  if (confirm('Load MCA III-C timetable preset? This will overwrite your current schedule.')) {
+                  if (confirm('Load MCA III-C timetable preset? This will replace your current schedule.')) {
                     onLoadPreset('C');
                   }
                 }}
               >
-                Section C
+                Section III-C
               </button>
             </div>
           </div>
@@ -422,19 +420,19 @@ export default function SettingsPanel({
           {/* Clear Timetable */}
           <div className="setting-row border-danger-top">
             <div className="setting-info">
-              <h4 className="text-danger-title">Danger Zone: Clear Timetable</h4>
-              <p>Remove all lectures and reset the application. This action is irreversible.</p>
+              <h4 className="text-danger-title">Danger Zone: Reset All</h4>
+              <p>Remove all lectures and clear local storage. Irreversible action.</p>
             </div>
             <button 
               className="btn btn-danger btn-sm" 
               onClick={() => {
-                if (confirm('Are you absolutely sure you want to delete all scheduled lectures? This cannot be undone.')) {
+                if (confirm('Are you sure you want to clear all scheduled lectures?')) {
                   onClearAll();
                 }
               }}
               disabled={timetable.length === 0}
             >
-              <Trash2 size={14} /> Clear All
+              <Trash2 size={14} /> Clear All Classes
             </button>
           </div>
         </div>
@@ -444,20 +442,20 @@ export default function SettingsPanel({
         .settings-grid {
           display: grid;
           grid-template-columns: 1fr;
-          gap: 20px;
+          gap: 24px;
         }
         .settings-card {
-          padding: 24px;
+          padding: 26px;
         }
         .settings-title {
-          font-size: 1.1rem;
+          font-size: 1.15rem;
           color: white;
           border-bottom: 1px solid var(--border-light);
-          padding-bottom: 12px;
-          margin-bottom: 16px;
+          padding-bottom: 14px;
+          margin-bottom: 20px;
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
         }
         .title-icon {
           color: var(--primary);
@@ -465,7 +463,7 @@ export default function SettingsPanel({
         .settings-body {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 22px;
         }
         .setting-row {
           display: flex;
@@ -476,18 +474,18 @@ export default function SettingsPanel({
         }
         .setting-info {
           flex: 1;
-          min-width: 250px;
+          min-width: 260px;
         }
         .setting-info h4 {
-          font-size: 1rem;
-          font-weight: 600;
+          font-size: 1.02rem;
+          font-weight: 700;
           color: white;
           margin-bottom: 4px;
         }
         .setting-info p {
-          font-size: 0.85rem;
+          font-size: 0.88rem;
           color: var(--text-secondary);
-          line-height: 1.4;
+          line-height: 1.45;
         }
         .setting-actions {
           display: flex;
@@ -496,37 +494,19 @@ export default function SettingsPanel({
         .flex-gap {
           gap: 10px;
         }
-        .badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          padding: 4px 10px;
-          border-radius: 99px;
-        }
         .badge-unsupported {
-          background: rgba(239, 68, 68, 0.1);
+          background: rgba(239, 68, 68, 0.12);
           color: var(--danger);
-          border: 1px solid var(--danger);
+          border: 1px solid rgba(239, 68, 68, 0.3);
         }
         .badge-success {
-          background: rgba(16, 185, 129, 0.1);
-          color: var(--success);
-          border: 1px solid var(--success);
-        }
-        .btn-success-solid {
-          background: var(--success);
-          color: white;
-          border-color: transparent;
-        }
-        .btn-success-solid:hover {
-          background: #059669;
+          background: rgba(16, 185, 129, 0.12);
+          color: #34d399;
+          border: 1px solid rgba(16, 185, 129, 0.3);
         }
         .select-duration {
           width: auto;
-          min-width: 160px;
-          background-color: var(--bg-surface);
+          min-width: 170px;
         }
         .hidden-file-input {
           display: none;
@@ -535,7 +515,7 @@ export default function SettingsPanel({
           margin-bottom: 0;
         }
         .border-danger-top {
-          border-top: 1px dashed rgba(239, 68, 68, 0.2);
+          border-top: 1px dashed rgba(239, 68, 68, 0.25);
           padding-top: 20px;
           margin-top: 10px;
         }

@@ -5,7 +5,8 @@
 const STORAGE_KEYS = {
   TIMETABLE: 'lecalert_timetable',
   SETTINGS: 'lecalert_settings',
-  GEMINI_KEY: 'lecalert_gemini_api_key'
+  GEMINI_KEY: 'lecalert_gemini_api_key',
+  ACADEMIC_EVENTS: 'lecalert_academic_events'
 };
 
 const DEFAULT_SETTINGS = {
@@ -1539,5 +1540,306 @@ export function formatTimeTo12Hr(timeStr) {
   h = h % 12;
   h = h ? h : 12;
   return `${h}:${m} ${ampm}`;
+}
+
+export const DEFAULT_ACADEMIC_EVENTS = [
+  // --- ACADEMIC CALENDAR MILESTONES ---
+  {
+    id: "abes-ac-1",
+    title: "Commencement of Classes (3rd Sem)",
+    category: "Sem Commencement",
+    startDate: "2026-07-16",
+    endDate: "2026-07-16",
+    details: "Induction and commencement of classes for MCA 3rd Semester.",
+    badgeColor: "#10b981"
+  },
+  {
+    id: "abes-ac-2",
+    title: "Commencement of Classes (1st Sem)",
+    category: "Sem Commencement",
+    startDate: "2026-08-17",
+    endDate: "2026-08-17",
+    details: "Induction and commencement of classes for MCA 1st Semester.",
+    badgeColor: "#10b981"
+  },
+  {
+    id: "abes-ac-3",
+    title: "Assessment 1 / Project Review-1 (3rd Sem)",
+    category: "Assignments & Reviews",
+    startDate: "2026-07-25",
+    endDate: "2026-07-31",
+    details: "Project Review-1 for MCA 3rd Sem (Last week of July).",
+    badgeColor: "#8b5cf6"
+  },
+  {
+    id: "abes-ac-4",
+    title: "Assessment 2 / Project Review-2 (3rd Sem)",
+    category: "Assignments & Reviews",
+    startDate: "2026-08-08",
+    endDate: "2026-08-14",
+    details: "Project Review-2 for MCA 3rd Sem (Second week of August).",
+    badgeColor: "#8b5cf6"
+  },
+  {
+    id: "abes-ac-5",
+    title: "Practical Assessment-I (In regular labs)",
+    category: "Lab & Viva",
+    startDate: "2026-09-14",
+    endDate: "2026-09-18",
+    details: "Practical Assessment-I for MCA 3rd Sem in regular lab periods.",
+    badgeColor: "#06b6d4"
+  },
+  {
+    id: "abes-ac-6",
+    title: "MT-1 / ST-1 Theory Examination",
+    category: "Exams",
+    startDate: "2026-09-21",
+    endDate: "2026-09-25",
+    details: "Mid Term 1 / Sessional Test 1 Theory Examination for MCA 1st & 3rd Sem (Weightage: 15 marks / 1.5 Units).",
+    badgeColor: "#ef4444"
+  },
+  {
+    id: "abes-ac-7",
+    title: "Evaluation & Answer Sheet Display (MT-1/ST-1)",
+    category: "Exams",
+    startDate: "2026-09-30",
+    endDate: "2026-09-30",
+    details: "Evaluation and answer sheet submission for MT-1/ST-1.",
+    badgeColor: "#f59e0b"
+  },
+  {
+    id: "abes-ac-8",
+    title: "Assessment 3 / Project Review-3 (3rd Sem)",
+    category: "Assignments & Reviews",
+    startDate: "2026-09-24",
+    endDate: "2026-09-30",
+    details: "Project Review-3 for MCA 3rd Sem (Last week of September).",
+    badgeColor: "#8b5cf6"
+  },
+  {
+    id: "abes-ac-9",
+    title: "Assessment 4 / Project Review-4 (3rd Sem)",
+    category: "Assignments & Reviews",
+    startDate: "2026-10-08",
+    endDate: "2026-10-14",
+    details: "Project Review-4 for MCA 3rd Sem (Second week of October).",
+    badgeColor: "#8b5cf6"
+  },
+  {
+    id: "abes-ac-10",
+    title: "MT-2 / ST-2 Theory Examination",
+    category: "Exams",
+    startDate: "2026-10-29",
+    endDate: "2026-11-05",
+    details: "Mid Term 2 / Sessional Test 2 Theory Examination for MCA 1st & 3rd Sem (Weightage: 15 marks / 1.5 Units).",
+    badgeColor: "#ef4444"
+  },
+  {
+    id: "abes-ac-11",
+    title: "Evaluation & Answer Sheet Display (MT-2/ST-2)",
+    category: "Exams",
+    startDate: "2026-11-18",
+    endDate: "2026-11-18",
+    details: "Evaluation and answer sheet submission for MT-2/ST-2.",
+    badgeColor: "#f59e0b"
+  },
+  {
+    id: "abes-ac-12",
+    title: "Practical Assessment-II (In regular labs)",
+    category: "Lab & Viva",
+    startDate: "2026-11-16",
+    endDate: "2026-11-20",
+    details: "Practical Assessment-II for MCA 1st & 3rd Sem in regular lab periods.",
+    badgeColor: "#06b6d4"
+  },
+  {
+    id: "abes-ac-13",
+    title: "Assessment 5",
+    category: "Assignments & Reviews",
+    startDate: "2026-11-24",
+    endDate: "2026-11-30",
+    details: "Assessment 5 for MCA 1st & 3rd Sem (Last week of November).",
+    badgeColor: "#8b5cf6"
+  },
+  {
+    id: "abes-ac-14",
+    title: "Make-up / ST-3 Theory Examination",
+    category: "Exams",
+    startDate: "2026-12-07",
+    endDate: "2026-12-12",
+    details: "Make-up / Sessional Test 3 Theory Exam (Weightage: 15 marks / 3 Units).",
+    badgeColor: "#ef4444"
+  },
+  {
+    id: "abes-ac-15",
+    title: "End Term / End Semester Theory & Viva Exams",
+    category: "Exams",
+    startDate: "2026-12-21",
+    endDate: "2027-01-15",
+    details: "End Semester Theory & Practical Viva Examination (Weightage: 40/70 marks).",
+    badgeColor: "#dc2626"
+  },
+
+  // --- OFFICIAL HOLIDAYS ---
+  {
+    id: "abes-hol-1",
+    title: "Shravan Shivratri",
+    category: "Holidays",
+    startDate: "2026-08-11",
+    endDate: "2026-08-11",
+    details: "College Holiday - Shravan Shivratri",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-2",
+    title: "Independence Day",
+    category: "Holidays",
+    startDate: "2026-08-15",
+    endDate: "2026-08-15",
+    details: "National Holiday - Independence Day",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-3",
+    title: "Eid-e-Milad / Milad-un-Nabi",
+    category: "Holidays",
+    startDate: "2026-08-26",
+    endDate: "2026-08-26",
+    details: "College Holiday - Milad-un-Nabi",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-4",
+    title: "Raksha Bandhan",
+    category: "Holidays",
+    startDate: "2026-08-28",
+    endDate: "2026-08-28",
+    details: "College Holiday - Raksha Bandhan",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-5",
+    title: "Janmashtami",
+    category: "Holidays",
+    startDate: "2026-09-04",
+    endDate: "2026-09-04",
+    details: "College Holiday - Janmashtami",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-6",
+    title: "Gandhi Jayanti",
+    category: "Holidays",
+    startDate: "2026-10-02",
+    endDate: "2026-10-02",
+    details: "National Holiday - Gandhi Jayanti",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-7",
+    title: "Maha Navmi",
+    category: "Holidays",
+    startDate: "2026-10-19",
+    endDate: "2026-10-19",
+    details: "College Holiday - Maha Navmi",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-8",
+    title: "Dussehra",
+    category: "Holidays",
+    startDate: "2026-10-20",
+    endDate: "2026-10-20",
+    details: "College Holiday - Dussehra",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-9",
+    title: "Diwali Holidays",
+    category: "Holidays",
+    startDate: "2026-11-06",
+    endDate: "2026-11-13",
+    details: "College Vacation - Diwali Festival Holidays (6 Nov - 13 Nov 2026)",
+    badgeColor: "#f43f5e"
+  },
+  {
+    id: "abes-hol-10",
+    title: "Guru Nanak Jayanti",
+    category: "Holidays",
+    startDate: "2026-11-24",
+    endDate: "2026-11-24",
+    details: "College Holiday - Guru Nanak Jayanti",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-11",
+    title: "Christmas Day",
+    category: "Holidays",
+    startDate: "2026-12-25",
+    endDate: "2026-12-25",
+    details: "College Holiday - Christmas Day",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-12",
+    title: "New Year",
+    category: "Holidays",
+    startDate: "2027-01-01",
+    endDate: "2027-01-01",
+    details: "College Holiday - New Year 2027",
+    badgeColor: "#ec4899"
+  },
+  {
+    id: "abes-hol-13",
+    title: "Republic Day",
+    category: "Holidays",
+    startDate: "2027-01-26",
+    endDate: "2027-01-26",
+    details: "National Holiday - Republic Day",
+    badgeColor: "#ec4899"
+  }
+];
+
+export function loadAcademicCalendar() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEYS.ACADEMIC_EVENTS);
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    console.error('Failed to load academic calendar:', e);
+  }
+  return DEFAULT_ACADEMIC_EVENTS;
+}
+
+export function saveAcademicCalendar(events) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.ACADEMIC_EVENTS, JSON.stringify(events));
+  } catch (e) {
+    console.error('Failed to save academic calendar:', e);
+  }
+}
+
+/**
+ * Determines whether a timetable slot is an actual academic lecture
+ * Excludes Lunch Break, Tea/Mini Break, Mentor-Mentee, and Library
+ * @param {Object} cls 
+ * @returns {boolean}
+ */
+export function isActualLecture(cls) {
+  if (!cls || !cls.name) return false;
+  const nameLower = cls.name.toLowerCase();
+  
+  if (
+    nameLower.includes('lunch') || 
+    nameLower.includes('break') || 
+    nameLower.includes('mentor') || 
+    nameLower.includes('mentee') ||
+    nameLower.includes('library')
+  ) {
+    return false;
+  }
+  return true;
 }
 

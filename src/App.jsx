@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Calendar, Settings as SettingsIcon, Bell, Plus, Check, AlertCircle, Share2 } from 'lucide-react';
+import { Clock, Calendar, Settings as SettingsIcon, Bell, Plus, Check, AlertCircle, Share2, CalendarDays } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import TimetableGrid from './components/TimetableGrid';
+import AcademicCalendar from './components/AcademicCalendar';
 import SettingsPanel, { playSyntheticChime } from './components/SettingsPanel';
 import ClassModal from './components/ClassModal';
 import { 
   loadTimetable, saveTimetable, loadSettings, saveSettings, parseShareUrl, 
+  loadAcademicCalendar, saveAcademicCalendar,
   DEFAULT_TIMETABLE_A, DEFAULT_TIMETABLE_B, DEFAULT_TIMETABLE_C 
 } from './utils/storageHelper';
 
@@ -37,6 +39,7 @@ export default function App() {
     preTime: 5,
     alarmSound: 'chime'
   });
+  const [academicEvents, setAcademicEvents] = useState(() => loadAcademicCalendar());
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
@@ -146,6 +149,11 @@ export default function App() {
   const handleSaveSettings = (newSettings) => {
     setSettings(newSettings);
     saveSettings(newSettings);
+  };
+
+  const handleSaveAcademicEvents = (newEvents) => {
+    setAcademicEvents(newEvents);
+    saveAcademicCalendar(newEvents);
   };
 
   // Admin Verification Helper
@@ -302,6 +310,12 @@ export default function App() {
             <Calendar size={16} /> Weekly Schedule
           </button>
           <button 
+            className={`nav-tab ${activeTab === 'academic' ? 'active' : ''}`}
+            onClick={() => setActiveTab('academic')}
+          >
+            <CalendarDays size={16} /> Academic Calendar
+          </button>
+          <button 
             className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
@@ -360,6 +374,14 @@ export default function App() {
                 setIsModalOpen(true);
               });
             }}
+          />
+        )}
+        {activeTab === 'academic' && (
+          <AcademicCalendar 
+            events={academicEvents} 
+            onSaveEvents={handleSaveAcademicEvents}
+            isAdmin={isAdmin}
+            verifyAdminAction={verifyAdminAction}
           />
         )}
         {activeTab === 'settings' && (

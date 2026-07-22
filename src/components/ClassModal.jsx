@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2 } from 'lucide-react';
+import { X, Trash2, BookOpen, User, MapPin, Calendar, Clock, Palette } from 'lucide-react';
 
 const PRESET_COLORS = [
   { name: 'Indigo', value: '#6366f1' },
@@ -91,9 +91,12 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content glass animate-fade-in">
+      <div className="modal-content glass animate-scale-in">
         <div className="modal-header">
-          <h2>{editingClass ? 'Edit Lecture' : 'Add New Lecture'}</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <BookOpen size={20} className="text-primary" />
+            <h2 className="modal-title">{editingClass ? 'Edit Lecture' : 'Add New Lecture'}</h2>
+          </div>
           <button className="btn-close" onClick={onClose} aria-label="Close modal">
             <X size={20} />
           </button>
@@ -103,20 +106,24 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
           {error && <div className="form-error">{error}</div>}
 
           <div className="form-group">
-            <label className="form-label">Subject / Class Name *</label>
+            <label className="form-label">
+              <BookOpen size={14} /> Subject / Class Name *
+            </label>
             <input
               type="text"
               className="form-input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Operating Systems, Advanced Math"
+              placeholder="e.g. Operating Systems, Machine Learning"
               required
             />
           </div>
 
           <div className="form-row">
             <div className="form-group flex-1">
-              <label className="form-label">Instructor / Professor</label>
+              <label className="form-label">
+                <User size={14} /> Instructor / Professor
+              </label>
               <input
                 type="text"
                 className="form-input"
@@ -126,21 +133,25 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
               />
             </div>
             <div className="form-group flex-1">
-              <label className="form-label">Room / Online Link</label>
+              <label className="form-label">
+                <MapPin size={14} /> Room / Venue / Link
+              </label>
               <input
                 type="text"
                 className="form-input"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Room 402, meet.google.com/abc"
+                placeholder="e.g. Lab 4, Room 402"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Day of the Week</label>
+            <label className="form-label">
+              <Calendar size={14} /> Day of the Week
+            </label>
             <select
-              className="form-input select-input"
+              className="form-select select-input"
               value={day}
               onChange={(e) => setDay(e.target.value)}
             >
@@ -154,7 +165,9 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
 
           <div className="form-row">
             <div className="form-group flex-1">
-              <label className="form-label">Start Time</label>
+              <label className="form-label">
+                <Clock size={14} /> Start Time
+              </label>
               <input
                 type="time"
                 className="form-input"
@@ -163,7 +176,9 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
               />
             </div>
             <div className="form-group flex-1">
-              <label className="form-label">End Time</label>
+              <label className="form-label">
+                <Clock size={14} /> End Time
+              </label>
               <input
                 type="time"
                 className="form-input"
@@ -174,7 +189,9 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
           </div>
 
           <div className="form-group">
-            <label className="form-label">Theme Color</label>
+            <label className="form-label">
+              <Palette size={14} /> Theme Accent Color
+            </label>
             <div className="color-picker-grid">
               {PRESET_COLORS.map((col) => (
                 <button
@@ -202,7 +219,7 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
                   }
                 }}
               >
-                <Trash2 size={16} /> Delete
+                <Trash2 size={15} /> Delete Class
               </button>
             )}
             <button type="button" className="btn btn-secondary" onClick={onClose}>
@@ -222,51 +239,55 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.6);
-          backdrop-filter: blur(4px);
+          background: rgba(4, 6, 14, 0.85);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 1000;
-          padding: 16px;
+          padding: 20px;
         }
         .modal-content {
           width: 100%;
-          max-width: 520px;
-          border-radius: var(--radius-lg);
-          padding: 24px;
+          max-width: 540px;
+          padding: 26px;
+          border-radius: var(--radius-xl);
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 30px rgba(99, 102, 241, 0.2);
         }
         .modal-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 20px;
+          margin-bottom: 22px;
           border-bottom: 1px solid var(--border-light);
-          padding-bottom: 12px;
+          padding-bottom: 14px;
         }
-        .modal-header h2 {
-          font-size: 1.4rem;
+        .modal-title {
+          font-size: 1.3rem;
+          font-weight: 700;
           color: var(--text-primary);
         }
         .btn-close {
           background: transparent;
           border: none;
-          color: var(--text-secondary);
+          color: var(--text-muted);
           cursor: pointer;
-          transition: color var(--transition-fast);
+          transition: all var(--transition-fast);
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 4px;
-          border-radius: 50%;
+          padding: 6px;
+          border-radius: var(--radius-sm);
         }
         .btn-close:hover {
           color: white;
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(255, 255, 255, 0.1);
         }
         .modal-form {
           display: flex;
           flex-direction: column;
+          gap: 16px;
         }
         .form-row {
           display: flex;
@@ -283,10 +304,6 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
           background-size: 16px;
           padding-right: 40px;
         }
-        .select-input option {
-          background-color: var(--bg-surface);
-          color: var(--text-primary);
-        }
         .color-picker-grid {
           display: flex;
           gap: 12px;
@@ -300,36 +317,42 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
           border: 2px solid transparent;
           cursor: pointer;
           transition: transform var(--transition-fast), border-color var(--transition-fast);
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         .color-btn:hover {
-          transform: scale(1.15);
+          transform: scale(1.18);
         }
         .color-btn.active {
           border-color: white;
-          transform: scale(1.1);
-          box-shadow: 0 0 12px currentColor;
+          transform: scale(1.12);
+          box-shadow: 0 0 14px currentColor;
         }
         .form-error {
           background: rgba(239, 68, 68, 0.15);
           border: 1px solid var(--danger);
           color: #f87171;
-          padding: 10px 12px;
-          border-radius: var(--radius-sm);
+          padding: 10px 14px;
+          border-radius: var(--radius-md);
           font-size: 0.9rem;
-          margin-bottom: 16px;
           text-align: center;
         }
         .modal-actions {
           display: flex;
           justify-content: flex-end;
           gap: 12px;
-          margin-top: 24px;
+          margin-top: 10px;
           border-top: 1px solid var(--border-light);
           padding-top: 18px;
         }
         .mr-auto {
           margin-right: auto;
+        }
+
+        @media (max-width: 600px) {
+          .form-row {
+            flex-direction: column;
+            gap: 16px;
+          }
         }
       `}</style>
     </div>
