@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Clock, Calendar, Settings as SettingsIcon, Bell, Plus, Check, AlertCircle, Share2, CalendarDays, Menu, X, Coffee, Zap, Layers, Palette, ChevronDown } from 'lucide-react';
+import { Clock, Calendar, Settings as SettingsIcon, Bell, Plus, Check, AlertCircle, Share2, CalendarDays, Menu, X, Coffee, Zap, Layers, Palette, ChevronDown, UserCheck, Shield, GraduationCap } from 'lucide-react';
+import StudentPanel from './components/StudentPanel';
+import TeacherPanel from './components/TeacherPanel';
+import AdminPanel from './components/AdminPanel';
+import AutoGeneratorModal from './components/AutoGeneratorModal';
 import Dashboard from './components/Dashboard';
 import TimetableGrid from './components/TimetableGrid';
 import AcademicCalendar from './components/AcademicCalendar';
@@ -40,8 +44,9 @@ export default function App() {
     alarmSound: 'chime'
   });
   const [academicEvents, setAcademicEvents] = useState(() => loadAcademicCalendar());
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('student');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [isAdmin, setIsAdmin] = useState(() => {
     try {
@@ -323,26 +328,32 @@ export default function App() {
           </div>
         </div>
 
-        {/* Desktop Navbar */}
+        {/* Desktop Navbar - 3 Portals Architecture */}
         <nav className="desktop-nav">
           <div className="nav-tabs">
             <button 
-              className={`nav-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
+              className={`nav-tab ${activeTab === 'student' ? 'active' : ''}`}
+              onClick={() => setActiveTab('student')}
             >
-              <Clock size={16} /> Dashboard
+              <GraduationCap size={16} /> Student Portal
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'teacher' ? 'active' : ''}`}
+              onClick={() => setActiveTab('teacher')}
+            >
+              <UserCheck size={16} /> Teacher Portal
+            </button>
+            <button 
+              className={`nav-tab ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+            >
+              <Shield size={16} /> Admin Portal
             </button>
             <button 
               className={`nav-tab ${activeTab === 'academic' ? 'active' : ''}`}
               onClick={() => setActiveTab('academic')}
             >
               <CalendarDays size={16} /> Academic Calendar
-            </button>
-            <button 
-              className={`nav-tab ${activeTab === 'settings' ? 'active' : ''}`}
-              onClick={() => setActiveTab('settings')}
-            >
-              <SettingsIcon size={16} /> Settings
             </button>
           </div>
         </nav>
@@ -447,10 +458,10 @@ export default function App() {
         </div>
       )}
 
-      {/* Main Panel Content */}
+      {/* Main Panel Content - 3 Portals */}
       <main className="app-main-content">
-        {activeTab === 'dashboard' && (
-          <Dashboard 
+        {(activeTab === 'student' || activeTab === 'dashboard') && (
+          <StudentPanel 
             timetable={timetable} 
             settings={settings}
             onAddClick={async () => {
@@ -469,16 +480,23 @@ export default function App() {
             selectedSection={selectedSection}
           />
         )}
-        {activeTab === 'academic' && (
-          <AcademicCalendar 
-            events={academicEvents} 
-            onSaveEvents={handleSaveAcademicEvents}
+
+        {activeTab === 'teacher' && (
+          <TeacherPanel 
+            timetable={timetable}
+            settings={settings}
             isAdmin={isAdmin}
-            verifyAdminAction={verifyAdminAction}
+            onEditClick={async (cls) => {
+              await verifyAdminAction(() => {
+                setEditingClass(cls);
+                setIsModalOpen(true);
+              });
+            }}
           />
         )}
-        {activeTab === 'settings' && (
-          <SettingsPanel 
+
+        {activeTab === 'admin' && (
+          <AdminPanel 
             timetable={timetable} 
             settings={settings} 
             onSaveSettings={handleSaveSettings}
@@ -502,9 +520,36 @@ export default function App() {
             onToggleAdmin={handleToggleAdmin}
             currentTheme={theme}
             onThemeChange={setTheme}
+            onOpenGenerator={() => setIsGeneratorOpen(true)}
+            onEditClick={async (cls) => {
+              await verifyAdminAction(() => {
+                setEditingClass(cls);
+                setIsModalOpen(true);
+              });
+            }}
+            onSaveTimetable={handleSaveTimetable}
+          />
+        )}
+
+        {activeTab === 'academic' && (
+          <AcademicCalendar 
+            events={academicEvents} 
+            onSaveEvents={handleSaveAcademicEvents}
+            isAdmin={isAdmin}
+            verifyAdminAction={verifyAdminAction}
           />
         )}
       </main>
+
+      {/* AI Automatic Timetable Generator Modal */}
+      <AutoGeneratorModal 
+        isOpen={isGeneratorOpen}
+        onClose={() => setIsGeneratorOpen(false)}
+        onApplyTimetable={(generatedTable) => {
+          handleSaveTimetable(generatedTable);
+          alert('Conflict-free timetable published successfully!');
+        }}
+      />
 
       {/* Footer */}
       <footer className="page-footer">

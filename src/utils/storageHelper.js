@@ -1898,3 +1898,55 @@ export function isActualLecture(cls) {
   return true;
 }
 
+/**
+ * Gets all lectures across Section A, B, and C combined
+ */
+export function getAllMasterLectures() {
+  const secA = DEFAULT_TIMETABLE_A.map(cls => ({ ...cls, section: cls.section || 'A' }));
+  const secB = DEFAULT_TIMETABLE_B.map(cls => ({ ...cls, section: cls.section || 'B' }));
+  const secC = DEFAULT_TIMETABLE_C.map(cls => ({ ...cls, section: cls.section || 'C' }));
+  return [...secA, ...secB, ...secC];
+}
+
+/**
+ * Extracts list of unique teacher names from timetable array
+ */
+export function extractUniqueTeachers(timetable = []) {
+  const teacherSet = new Set();
+  const listToScan = (timetable && timetable.length > 0) ? timetable : getAllMasterLectures();
+
+  listToScan.forEach(cls => {
+    if (cls.substituteTeacher) {
+      teacherSet.add(cls.substituteTeacher.trim());
+    }
+    if (cls.teacher) {
+      // Split multi-teacher entries separated by / or +
+      const raw = cls.teacher;
+      const parts = raw.split(/[\/+]/).map(t => t.trim()).filter(Boolean);
+      parts.forEach(p => teacherSet.add(p));
+    }
+  });
+
+  return Array.from(teacherSet).sort();
+}
+
+/**
+ * Returns filtered timetable assigned to a specific teacher (including substitute duties)
+ */
+export function getTeacherTimetable(timetable = [], teacherName = '') {
+  if (!teacherName) return [];
+  const listToScan = (timetable && timetable.length > 0) ? timetable : getAllMasterLectures();
+  const searchLower = teacherName.toLowerCase().trim();
+
+  return listToScan.filter(cls => {
+    if (cls.substituteTeacher && cls.substituteTeacher.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    if (cls.teacher && cls.teacher.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    return false;
+  });
+}
+
+
