@@ -374,7 +374,7 @@ export default function App() {
             <button 
               className="header-theme-btn" 
               onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-              title="Quick Theme Selector (20 Themes)"
+              title="Quick Theme Selector"
             >
               <Palette size={16} style={{ color: 'var(--primary)' }} />
               <span>Theme</span>
@@ -384,7 +384,7 @@ export default function App() {
             {isThemeDropdownOpen && (
               <div className="header-theme-dropdown glass">
                 <div style={{ padding: '6px 8px', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', borderBottom: '1px solid var(--border-light)' }}>
-                  SELECT THEME (20)
+                  SELECT APP THEME
                 </div>
                 {ALL_THEMES.map((t) => {
                   const IconComp = t.icon;
@@ -466,7 +466,7 @@ export default function App() {
             {/* Mobile Theme Selector */}
             <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-light)', paddingTop: '16px' }}>
               <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Palette size={15} style={{ color: 'var(--primary)' }} /> APP THEME (20 THEMES)
+                <Palette size={15} style={{ color: 'var(--primary)' }} /> APP THEME
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', maxHeight: '220px', overflowY: 'auto' }}>
                 {ALL_THEMES.map((t) => {
