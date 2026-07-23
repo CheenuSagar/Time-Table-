@@ -358,6 +358,12 @@ export default function App() {
             >
               <CalendarDays size={16} /> Academic Calendar
             </button>
+            <button 
+              className="nav-tab"
+              onClick={() => setIsFeedbackOpen(true)}
+            >
+              <MessageSquare size={16} style={{ color: 'var(--secondary)' }} /> Feedback & Support
+            </button>
           </div>
         </nav>
 
@@ -460,6 +466,12 @@ export default function App() {
                 onClick={() => { setActiveTab('academic'); setIsMobileMenuOpen(false); }}
               >
                 <CalendarDays size={18} /> Academic Calendar
+              </button>
+              <button 
+                className="mobile-nav-item"
+                onClick={() => { setIsFeedbackOpen(true); setIsMobileMenuOpen(false); }}
+              >
+                <MessageSquare size={18} style={{ color: 'var(--secondary)' }} /> Feedback & Support
               </button>
             </div>
 
