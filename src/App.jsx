@@ -837,23 +837,33 @@ export default function App() {
 
         @media (max-width: 768px) {
           .app-header {
-            flex-direction: column;
-            gap: 14px;
-            padding: 16px;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 0 !important;
+            padding: 12px 16px !important;
             top: 0;
             border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-            margin: -20px -16px 0 -16px;
+            margin: 0 0 16px 0 !important;
           }
-          .nav-tabs {
-            width: 100%;
-            justify-content: space-around;
+          .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
           }
-          .nav-tab {
-            padding: 8px 10px;
-            font-size: 0.8rem;
+          .logo-text {
+            font-size: 1.15rem;
+            white-space: nowrap;
+          }
+          .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
           }
           .add-quick-btn {
-            display: none; /* Hide quick add on mobile header since page grids have it */
+            display: none !important;
           }
         }
       `}</style>
