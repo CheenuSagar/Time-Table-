@@ -9,6 +9,8 @@ import TimetableGrid from './components/TimetableGrid';
 import AcademicCalendar from './components/AcademicCalendar';
 import SettingsPanel, { playSyntheticChime, ALL_THEMES } from './components/SettingsPanel';
 import ClassModal from './components/ClassModal';
+import FeedbackModal from './components/FeedbackModal';
+import { MessageSquare } from 'lucide-react';
 import { 
   loadTimetable, saveTimetable, loadSettings, saveSettings, parseShareUrl, 
   loadAcademicCalendar, saveAcademicCalendar,
@@ -47,6 +49,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('student');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [isAdmin, setIsAdmin] = useState(() => {
     try {
@@ -603,6 +606,22 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Floating Feedback Button */}
+      <button 
+        className="floating-feedback-btn"
+        onClick={() => setIsFeedbackOpen(true)}
+        title="Feedback & Problem Report"
+      >
+        <MessageSquare size={18} />
+        <span>Feedback & Support</span>
+      </button>
+
+      {/* Feedback Modal */}
+      <FeedbackModal 
+        isOpen={isFeedbackOpen} 
+        onClose={() => setIsFeedbackOpen(false)} 
+      />
 
       <style>{`
         .app-layout {
