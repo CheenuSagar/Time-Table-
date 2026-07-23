@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { 
   Shield, Lock, Unlock, Zap, RefreshCw, FileText, 
-  Download, Upload, Trash2, Check, AlertTriangle, Plus, Edit2, UserCheck, Layers, MapPin
+  Download, Upload, Trash2, Check, AlertTriangle, Plus, Edit2, UserCheck, Layers, MapPin, Key
 } from 'lucide-react';
 import SettingsPanel from './SettingsPanel';
+import { extractUniqueTeachers, loadTeacherPINs, saveTeacherPINs } from '../utils/storageHelper';
 
 export default function AdminPanel({
   timetable,
@@ -23,6 +24,10 @@ export default function AdminPanel({
 }) {
   const [selectedClassId, setSelectedClassId] = useState('');
   const [proxyTeacherName, setProxyTeacherName] = useState('');
+
+  const allTeachers = extractUniqueTeachers(timetable);
+  const [teacherPinsMap, setTeacherPinsMap] = useState(() => loadTeacherPINs(allTeachers));
+  const [editingTeacherPin, setEditingTeacherPin] = useState({});
 
   const handleAssignProxy = () => {
     if (!selectedClassId || !proxyTeacherName) {
@@ -57,6 +62,16 @@ export default function AdminPanel({
     onSaveTimetable(updated);
   };
 
+  const handleUpdatePIN = (teacherName, newPin) => {
+    const updated = {
+      ...teacherPinsMap,
+      [teacherName]: String(newPin).trim()
+    };
+    setTeacherPinsMap(updated);
+    saveTeacherPINs(updated);
+    alert(`PIN updated successfully for ${teacherName}!`);
+  };
+
   const proxyClasses = timetable.filter(c => c.substituteTeacher);
 
   return (
@@ -71,7 +86,7 @@ export default function AdminPanel({
             <h3>Admin Management Portal</h3>
             <p>
               {isAdmin 
-                ? 'Admin Mode Active: Full permission to auto-generate timetables, assign substitute teachers, and modify lectures.' 
+                ? 'Admin Mode Active: Full permission to auto-generate timetables, assign substitute teachers, manage PINs, and modify lectures.' 
                 : 'Locked View Mode: Click Unlock Admin Mode to perform administrative changes.'}
             </p>
           </div>
@@ -177,6 +192,50 @@ export default function AdminPanel({
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Card 3: Faculty PIN & Passcode Management */}
+          <div className="admin-card glass" style={{ gridColumn: '1 / -1' }}>
+            <div className="admin-card-header">
+              <Key size={22} style={{ color: 'var(--primary)' }} />
+              <div>
+                <h4>Faculty PIN & Passcode Management</h4>
+                <p>Manage and update private 4-digit PINs for each teacher</p>
+              </div>
+            </div>
+
+            <div className="admin-card-body">
+              <div className="admin-pin-grid">
+                {allTeachers.map((t) => {
+                  const currentPin = teacherPinsMap[t] || '1001';
+                  const editValue = editingTeacherPin[t] !== undefined ? editingTeacherPin[t] : currentPin;
+
+                  return (
+                    <div key={t} className="pin-admin-row">
+                      <div className="pin-admin-name">
+                        <UserCheck size={16} style={{ color: 'var(--primary)' }} />
+                        <span>{t}</span>
+                      </div>
+                      <div className="pin-admin-controls">
+                        <input 
+                          type="text" 
+                          maxLength={6}
+                          className="form-input form-input-sm pin-admin-input" 
+                          value={editValue}
+                          onChange={(e) => setEditingTeacherPin({ ...editingTeacherPin, [t]: e.target.value })}
+                        />
+                        <button 
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleUpdatePIN(t, editValue)}
+                        >
+                          Update PIN
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

@@ -1949,4 +1949,63 @@ export function getTeacherTimetable(timetable = [], teacherName = '') {
   });
 }
 
+const TEACHER_PIN_STORAGE_KEY = 'lecalert_teacher_pins';
+
+/**
+ * Load or generate default PINs for all teachers
+ */
+export function loadTeacherPINs(teachersList = []) {
+  try {
+    const data = localStorage.getItem(TEACHER_PIN_STORAGE_KEY);
+    let pins = {};
+    if (data) {
+      pins = JSON.parse(data) || {};
+    }
+
+    // Assign default sequential 4-digit PINs (1001, 1002...) for any missing teachers
+    let pinCounter = 1001;
+    let modified = false;
+
+    teachersList.forEach((t) => {
+      if (!pins[t]) {
+        while (Object.values(pins).includes(String(pinCounter))) {
+          pinCounter++;
+        }
+        pins[t] = String(pinCounter);
+        pinCounter++;
+        modified = true;
+      }
+    });
+
+    if (modified) {
+      saveTeacherPINs(pins);
+    }
+    return pins;
+  } catch (e) {
+    console.error('Failed to load teacher PINs:', e);
+    return {};
+  }
+}
+
+/**
+ * Save teacher PIN map
+ */
+export function saveTeacherPINs(pins) {
+  try {
+    localStorage.setItem(TEACHER_PIN_STORAGE_KEY, JSON.stringify(pins));
+  } catch (e) {
+    console.error('Failed to save teacher PINs:', e);
+  }
+}
+
+/**
+ * Verify teacher PIN
+ */
+export function verifyTeacherPIN(teacherName, inputPin, pinsMap) {
+  if (!teacherName || !inputPin || !pinsMap) return false;
+  const expectedPin = pinsMap[teacherName];
+  return String(inputPin).trim() === String(expectedPin).trim();
+}
+
+
 
