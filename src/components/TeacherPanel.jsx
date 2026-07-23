@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { UserCheck, Clock, MapPin, Calendar, Download, RefreshCw, AlertCircle, Sparkles, BookOpen, Layers, Lock, Unlock, Key, ShieldCheck, KeyRound } from 'lucide-react';
-import { extractUniqueTeachers, getTeacherTimetable, isActualLecture, loadTeacherPINs, saveTeacherPINs } from '../utils/storageHelper';
+import { UserCheck, Clock, MapPin, Calendar, Download, RefreshCw, AlertCircle, Sparkles, BookOpen, Layers, Lock, Unlock, Key, ShieldCheck, KeyRound, X, Bell, CheckCircle2 } from 'lucide-react';
+import { extractUniqueTeachers, getTeacherTimetable, isActualLecture, loadTeacherPINs, saveTeacherPINs, loadTeacherNotifications, saveTeacherNotifications, addProxyNotification } from '../utils/storageHelper';
 import { downloadICSFile } from '../utils/icsHelper';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -11,7 +11,7 @@ function timeToMinutes(timeStr) {
   return h * 60 + m;
 }
 
-export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin }) {
+export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin, onSaveTimetable }) {
   const allTeachers = extractUniqueTeachers(timetable);
   const [teacherPins, setTeacherPins] = useState(() => loadTeacherPINs(allTeachers));
 
@@ -34,6 +34,11 @@ export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Proxy duty assignment state
+  const [proxyModalClass, setProxyModalClass] = useState(null);
+  const [proxyTeacherTarget, setProxyTeacherTarget] = useState('');
+  const [notifications, setNotifications] = useState(() => loadTeacherNotifications());
 
   // Change PIN modal / inline state
   const [isChangingPin, setIsChangingPin] = useState(false);
@@ -156,6 +161,10 @@ export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin
       .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
   });
 
+  const myNotifications = authenticatedTeacher 
+    ? notifications.filter(n => n.toTeacher === authenticatedTeacher)
+    : [];
+
   return (
     <div className="teacher-panel animate-fade-in">
       {!isUnlocked ? (
@@ -252,6 +261,50 @@ export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin
               </div>
             )}
           </div>
+
+          {/* Notifications Inbox for Active Teacher */}
+          {authenticatedTeacher && myNotifications.length > 0 && (
+            <div className="admin-card glass card-featured" style={{ marginBottom: '20px', borderColor: 'var(--primary)' }}>
+              <div className="admin-card-header">
+                <div className="status-live-indicator">
+                  <Bell size={20} style={{ color: 'var(--primary)' }} />
+                </div>
+                <div>
+                  <h4 style={{ margin: 0 }}>🔔 Proxy Duty Notifications ({myNotifications.length})</h4>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                    Other faculty members have assigned substitute lectures to you.
+                  </p>
+                </div>
+              </div>
+
+              <div className="admin-card-body" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {myNotifications.map((n) => (
+                  <div key={n.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderRadius: 'var(--radius-md)', background: 'rgba(99, 102, 241, 0.08)', border: '1px solid var(--border-light)', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                        {n.fromTeacher} assigned proxy for <span style={{ color: 'var(--primary)' }}>{n.className}</span>
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                        📅 {n.day} ({n.startTime} - {n.endTime}) • Room: {n.location} • {n.section}
+                      </div>
+                    </div>
+
+                    <button 
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '0.78rem', padding: '4px 10px' }}
+                      onClick={() => {
+                        const updated = notifications.filter(item => item.id !== n.id);
+                        saveTeacherNotifications(updated);
+                        setNotifications(updated);
+                      }}
+                    >
+                      <CheckCircle2 size={14} style={{ color: 'var(--success)' }} /> Acknowledge Alert
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Change PIN Inline Card */}
           {isChangingPin && (
@@ -404,10 +457,24 @@ export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin
                               </span>
                               {cls.substituteTeacher && (
                                 <span className="card-proxy-tag">
-                                  <RefreshCw size={11} /> Proxy Assignment
+                                  <RefreshCw size={11} /> {cls.substituteTeacher}
                                 </span>
                               )}
                             </div>
+
+                            {authenticatedTeacher && (
+                              <button 
+                                className="btn btn-secondary btn-xs"
+                                style={{ marginTop: '8px', fontSize: '0.75rem', padding: '4px 8px', width: '100%', justifyContent: 'center' }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setProxyModalClass(cls);
+                                  setProxyTeacherTarget(cls.substituteTeacher || '');
+                                }}
+                              >
+                                <RefreshCw size={12} /> {cls.substituteTeacher ? `Change Proxy (${cls.substituteTeacher})` : 'Assign Proxy'}
+                              </button>
+                            )}
                           </div>
                         ))
                       ) : (
@@ -421,7 +488,76 @@ export default function TeacherPanel({ timetable, settings, onEditClick, isAdmin
           </div>
         </>
       )}
+
+      {/* Proxy Assignment Modal */}
+      {proxyModalClass && (
+        <div className="modal-overlay" style={{ zIndex: 1100 }}>
+          <div className="modal-content glass animate-fade-in" style={{ maxWidth: '440px', padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <RefreshCw size={20} style={{ color: 'var(--primary)' }} />
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>Assign Substitute Teacher</h3>
+              </div>
+              <button className="icon-btn" onClick={() => setProxyModalClass(null)}><X size={18} /></button>
+            </div>
+
+            <p style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: 1.5 }}>
+              Assign a colleague to take over <strong>{proxyModalClass.name}</strong> on {proxyModalClass.day} ({proxyModalClass.startTime} - {proxyModalClass.endTime}). An instant notification will be sent to the substitute faculty member.
+            </p>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label className="form-label" style={{ fontWeight: 600, marginBottom: '6px' }}>Select Substitute Faculty Member:</label>
+              <select 
+                className="form-select"
+                value={proxyTeacherTarget}
+                onChange={(e) => setProxyTeacherTarget(e.target.value)}
+                style={{ width: '100%', padding: '10px' }}
+              >
+                <option value="">-- Choose Faculty Member --</option>
+                {allTeachers.filter(t => t !== activeTeacher).map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+              {proxyModalClass.substituteTeacher && (
+                <button 
+                  className="btn btn-danger btn-sm"
+                  onClick={() => {
+                    const updated = timetable.map(c => c.id === proxyModalClass.id ? { ...c, substituteTeacher: '' } : c);
+                    if (onSaveTimetable) onSaveTimetable(updated);
+                    setProxyModalClass(null);
+                  }}
+                >
+                  Remove Proxy
+                </button>
+              )}
+              <button 
+                className="btn btn-primary btn-sm"
+                onClick={() => {
+                  if (!proxyTeacherTarget) {
+                    alert('Please select a substitute faculty member.');
+                    return;
+                  }
+                  const updated = timetable.map(c => c.id === proxyModalClass.id ? { ...c, substituteTeacher: proxyTeacherTarget } : c);
+                  if (onSaveTimetable) onSaveTimetable(updated);
+                  addProxyNotification({
+                    fromTeacher: activeTeacher,
+                    toTeacher: proxyTeacherTarget,
+                    classObj: proxyModalClass
+                  });
+                  setNotifications(loadTeacherNotifications());
+                  setProxyModalClass(null);
+                  alert(`Proxy duty assigned to ${proxyTeacherTarget}! Notification sent to their portal.`);
+                }}
+              >
+                Assign & Send Notification
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

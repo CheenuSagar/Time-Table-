@@ -6,8 +6,46 @@ const STORAGE_KEYS = {
   TIMETABLE: 'lecalert_timetable',
   SETTINGS: 'lecalert_settings',
   GEMINI_KEY: 'lecalert_gemini_api_key',
-  ACADEMIC_EVENTS: 'lecalert_academic_events'
+  ACADEMIC_EVENTS: 'lecalert_academic_events',
+  TEACHER_NOTIFICATIONS: 'lecalert_teacher_notifications'
 };
+
+export function loadTeacherNotifications() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.TEACHER_NOTIFICATIONS);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function saveTeacherNotifications(notifications) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.TEACHER_NOTIFICATIONS, JSON.stringify(notifications));
+  } catch (e) {
+    console.error('Failed to save teacher notifications:', e);
+  }
+}
+
+export function addProxyNotification({ fromTeacher, toTeacher, classObj }) {
+  const notifs = loadTeacherNotifications();
+  const newNotif = {
+    id: `notif-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    fromTeacher,
+    toTeacher,
+    classId: classObj.id,
+    className: classObj.name,
+    day: classObj.day,
+    startTime: classObj.startTime,
+    endTime: classObj.endTime,
+    location: classObj.location,
+    timestamp: new Date().toISOString(),
+    isRead: false
+  };
+  const updated = [newNotif, ...notifs];
+  saveTeacherNotifications(updated);
+  return updated;
+}
 
 const DEFAULT_SETTINGS = {
   soundEnabled: true,

@@ -566,6 +566,7 @@ export default function App() {
             timetable={timetable}
             settings={settings}
             isAdmin={isAdmin}
+            onSaveTimetable={handleSaveTimetable}
             onEditClick={async (cls) => {
               await verifyAdminAction(() => {
                 setEditingClass(cls);
