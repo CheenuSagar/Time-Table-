@@ -1754,6 +1754,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .app-layout {
+    padding-top: calc(max(14px, env(safe-area-inset-top)) + 65px) !important;
+  }
+
   .header-theme-picker {
     display: none !important;
   }
@@ -1771,18 +1775,21 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .app-header {
-    margin-top: max(28px, env(safe-area-inset-top));
-    margin-bottom: 16px;
+    position: fixed !important;
+    top: max(14px, env(safe-area-inset-top)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100% - 24px) !important;
+    z-index: 1000 !important;
+    margin: 0 !important;
     border-radius: var(--radius-lg);
-    padding: 12px 16px;
+    padding: 10px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
     flex-wrap: nowrap;
     background: var(--bg-surface) !important;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    top: max(28px, env(safe-area-inset-top));
   }
 
   .brand-logo {
