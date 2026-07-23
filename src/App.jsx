@@ -354,58 +354,8 @@ export default function App() {
           >
             <Plus size={16} /> Quick Add
           </button>
-
-          {/* Mobile Hamburger Button */}
-          <button 
-            className="hamburger-btn" 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
         </div>
       </header>
-
-      {/* Mobile Navigation Drawer */}
-      {isMobileMenuOpen && (
-        <div className="mobile-drawer-overlay" onClick={() => setIsMobileMenuOpen(false)}>
-          <div className="mobile-drawer" onClick={(e) => e.stopPropagation()}>
-            <div className="mobile-drawer-header">
-              <span className="mobile-drawer-title">Navigation</span>
-              <button className="modal-close-btn" onClick={() => setIsMobileMenuOpen(false)}>
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="mobile-nav-list">
-              <button 
-                className={`mobile-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}
-              >
-                <Clock size={18} /> Dashboard
-              </button>
-              <button 
-                className="mobile-nav-item"
-                onClick={() => { setIsWeeklyPopupOpen(true); setIsMobileMenuOpen(false); }}
-              >
-                <Calendar size={18} /> Weekly Schedule
-              </button>
-              <button 
-                className={`mobile-nav-item ${activeTab === 'academic' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('academic'); setIsMobileMenuOpen(false); }}
-              >
-                <CalendarDays size={18} /> Academic Calendar
-              </button>
-              <button 
-                className={`mobile-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('settings'); setIsMobileMenuOpen(false); }}
-              >
-                <SettingsIcon size={18} /> Settings
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Sticky Floating Bottom Trigger for Weekly Schedule */}
       <button 
