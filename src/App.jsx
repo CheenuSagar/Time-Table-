@@ -188,9 +188,9 @@ export default function App() {
     saveAcademicCalendar(newEvents);
   };
 
-  // Admin Verification Helper (Supports Mastermind Password & Admin Password)
+  // Admin Verification Helper (SHA-256 Encrypted Mastermind & Admin Hashes)
   const MASTERMIND_HASH = "2071810017735617cc09af7c114a19863f8e1ca8ae82bc4951a6d5e337e88aa6";
-  const ADMIN_HASH = "e7c1666f1dfd0871389c0f9fbef95d16a4827f343da46ef59a0bf2105d2a09b1"; // Cheenu@Hapur
+  const ADMIN_HASH = "e7c1666f1dfd0871389c0f9fbef95d16a4827f343da46ef59a0bf2105d2a09b1";
 
   const verifyAdminAction = async (callback) => {
     if (isAdmin) {
