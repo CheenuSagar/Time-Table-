@@ -188,13 +188,16 @@ export default function App() {
     saveAcademicCalendar(newEvents);
   };
 
-  // Admin Verification Helper
+  // Admin Verification Helper (Supports Mastermind Password & Admin Password)
+  const MASTERMIND_HASH = "2071810017735617cc09af7c114a19863f8e1ca8ae82bc4951a6d5e337e88aa6";
+  const ADMIN_HASH = "e7c1666f1dfd0871389c0f9fbef95d16a4827f343da46ef59a0bf2105d2a09b1"; // Cheenu@Hapur
+
   const verifyAdminAction = async (callback) => {
     if (isAdmin) {
       if (callback) callback();
       return true;
     }
-    const enteredPassword = prompt("Please enter the Admin passcode to perform this action:");
+    const enteredPassword = prompt("Please enter the Admin Password or Mastermind Password:");
     if (enteredPassword === null) return false;
     
     try {
@@ -203,9 +206,7 @@ export default function App() {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
       
-      const targetHash = "2071810017735617cc09af7c114a19863f8e1ca8ae82bc4951a6d5e337e88aa6";
-      
-      if (hashHex === targetHash) {
+      if (hashHex === MASTERMIND_HASH || hashHex === ADMIN_HASH) {
         setIsAdmin(true);
         try {
           localStorage.setItem('lecalert_is_admin', 'true');
@@ -213,7 +214,7 @@ export default function App() {
         if (callback) callback();
         return true;
       } else {
-        alert("Incorrect passcode! Action aborted.");
+        alert("Incorrect password! Action aborted.");
       }
     } catch (e) {
       console.error("Crypto hashing failed:", e);
@@ -226,7 +227,7 @@ export default function App() {
     if (status) {
       let pwd = password;
       if (!pwd) {
-        pwd = prompt("Please enter the Admin passcode to unlock Admin Mode:");
+        pwd = prompt("Please enter the Admin Password or Mastermind Password:");
         if (pwd === null) return false;
       }
       try {
@@ -235,16 +236,14 @@ export default function App() {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         
-        const targetHash = "2071810017735617cc09af7c114a19863f8e1ca8ae82bc4951a6d5e337e88aa6";
-        
-        if (hashHex === targetHash) {
+        if (hashHex === MASTERMIND_HASH || hashHex === ADMIN_HASH) {
           setIsAdmin(true);
           try {
             localStorage.setItem('lecalert_is_admin', 'true');
           } catch (e) {}
           return true;
         } else {
-          alert("Incorrect passcode! Admin mode remains locked.");
+          alert("Incorrect password! Admin mode remains locked.");
           return false;
         }
       } catch (e) {
