@@ -66,7 +66,8 @@ function classToCompactArray(cls) {
     cls.day || '',
     cls.startTime || '',
     cls.endTime || '',
-    cls.color || '#6366f1'
+    cls.color || '#6366f1',
+    cls.substituteTeacher || ''
   ];
 }
 
@@ -79,7 +80,8 @@ function compactArrayToClass(arr) {
     day: arr[4],
     startTime: arr[5],
     endTime: arr[6],
-    color: arr[7]
+    color: arr[7],
+    substituteTeacher: arr[8] || ''
   };
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, BookOpen, User, MapPin, Calendar, Clock, Palette } from 'lucide-react';
+import { X, Trash2, BookOpen, User, MapPin, Calendar, Clock, Palette, RefreshCw } from 'lucide-react';
 
 const PRESET_COLORS = [
   { name: 'Indigo', value: '#6366f1' },
@@ -25,6 +25,7 @@ const DAYS_OF_WEEK = [
 export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingClass }) {
   const [name, setName] = useState('');
   const [teacher, setTeacher] = useState('');
+  const [substituteTeacher, setSubstituteTeacher] = useState('');
   const [location, setLocation] = useState('');
   const [day, setDay] = useState('Monday');
   const [startTime, setStartTime] = useState('09:00');
@@ -36,6 +37,7 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
     if (editingClass) {
       setName(editingClass.name || '');
       setTeacher(editingClass.teacher || '');
+      setSubstituteTeacher(editingClass.substituteTeacher || '');
       setLocation(editingClass.location || '');
       setDay(editingClass.day || 'Monday');
       setStartTime(editingClass.startTime || '09:00');
@@ -45,6 +47,7 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
     } else {
       setName('');
       setTeacher('');
+      setSubstituteTeacher('');
       setLocation('');
       setDay('Monday');
       setStartTime('09:00');
@@ -78,6 +81,7 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
       id: editingClass ? editingClass.id : Date.now().toString(),
       name: name.trim(),
       teacher: teacher.trim(),
+      substituteTeacher: substituteTeacher.trim(),
       location: location.trim(),
       day,
       startTime,
@@ -122,7 +126,7 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
           <div className="form-row">
             <div className="form-group flex-1">
               <label className="form-label">
-                <User size={14} /> Instructor / Professor
+                <User size={14} /> Regular Instructor / Professor
               </label>
               <input
                 type="text"
@@ -144,6 +148,20 @@ export default function ClassModal({ isOpen, onClose, onSave, onDelete, editingC
                 placeholder="e.g. Lab 4, Room 402"
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" style={{ color: substituteTeacher ? '#f43f5e' : 'inherit' }}>
+              <RefreshCw size={14} /> Substitute / Replacement Teacher (Optional)
+            </label>
+            <input
+              type="text"
+              className="form-input"
+              value={substituteTeacher}
+              onChange={(e) => setSubstituteTeacher(e.target.value)}
+              placeholder="e.g. Prof. Chirag Jain (Leave blank if no proxy)"
+              style={{ borderColor: substituteTeacher ? '#f43f5e' : undefined }}
+            />
           </div>
 
           <div className="form-group">

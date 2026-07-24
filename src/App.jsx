@@ -145,11 +145,13 @@ export default function App() {
             setTimeout(playSyntheticChime, 1500);
           }
           
+          const subInfo = cls.substituteTeacher ? ` (Substitute Teacher: ${cls.substituteTeacher})` : '';
+          
           // 2. Trigger System Notification
           if (settings.notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
             try {
               new Notification(`Class Starting Soon!`, {
-                body: `${cls.name} starts in ${settings.preTime} minutes ${cls.location ? `at ${cls.location}` : ''}.`,
+                body: `${cls.name} starts in ${settings.preTime} minutes ${cls.location ? `at ${cls.location}` : ''}.${subInfo}`,
                 icon: '/favicon.ico',
                 tag: cls.id
               });
@@ -158,7 +160,7 @@ export default function App() {
             }
           } else {
             // Fallback in-app alert
-            alert(`Upcoming Lecture: "${cls.name}" starts in ${settings.preTime} minutes!`);
+            alert(`Upcoming Lecture: "${cls.name}" starts in ${settings.preTime} minutes!${subInfo}`);
           }
         }
       });

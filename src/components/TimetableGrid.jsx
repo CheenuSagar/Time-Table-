@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, User, PlusCircle, Edit3, Sparkles, Search, Grid, ListFilter, LayoutGrid } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, PlusCircle, Edit3, Sparkles, Search, Grid, ListFilter, LayoutGrid, RefreshCw } from 'lucide-react';
 import { formatTimeTo12Hr, isActualLecture } from '../utils/storageHelper';
 
 const DAYS_OF_WEEK = [
@@ -45,6 +45,7 @@ export default function TimetableGrid({ timetable, settings, onAddClick, onEditC
     return (
       (cls.name && cls.name.toLowerCase().includes(q)) ||
       (cls.teacher && cls.teacher.toLowerCase().includes(q)) ||
+      (cls.substituteTeacher && cls.substituteTeacher.toLowerCase().includes(q)) ||
       (cls.location && cls.location.toLowerCase().includes(q))
     );
   });
@@ -80,9 +81,14 @@ export default function TimetableGrid({ timetable, settings, onAddClick, onEditC
             <span>{show12h ? formatTimeTo12Hr(cls.startTime) : cls.startTime} - {show12h ? formatTimeTo12Hr(cls.endTime) : cls.endTime}</span>
           </div>
 
-          {(cls.teacher || cls.location) && (
-            <div className="graphical-card-footer">
-              {cls.teacher && (
+          {(cls.teacher || cls.substituteTeacher || cls.location) && (
+            <div className="graphical-card-footer" style={{ flexWrap: 'wrap' }}>
+              {cls.substituteTeacher ? (
+                <div className="footer-chip" style={{ color: '#f43f5e', borderColor: 'rgba(244, 63, 94, 0.4)', background: 'rgba(244, 63, 94, 0.1)', fontWeight: 700 }}>
+                  <RefreshCw size={13} />
+                  <span>Sub: {cls.substituteTeacher}</span>
+                </div>
+              ) : cls.teacher && (
                 <div className="footer-chip">
                   <User size={13} />
                   <span>{cls.teacher}</span>
@@ -203,7 +209,13 @@ export default function TimetableGrid({ timetable, settings, onAddClick, onEditC
                               <div className="slot-details">
                                 <div className="slot-name">{cls.name}</div>
                                 <div className="slot-sub">
-                                  {cls.teacher && <span>👤 {cls.teacher}</span>}
+                                  {cls.substituteTeacher ? (
+                                    <span style={{ color: '#f43f5e', fontWeight: 700 }}>
+                                      🔄 Sub: {cls.substituteTeacher} <span style={{ textDecoration: 'line-through', opacity: 0.6, fontSize: '0.75rem', fontWeight: 400 }}>({cls.teacher})</span>
+                                    </span>
+                                  ) : (
+                                    cls.teacher && <span>👤 {cls.teacher}</span>
+                                  )}
                                   {cls.location && <span>📍 {cls.location}</span>}
                                   {durationStr && <span className="slot-dur">⌛ {durationStr}</span>}
                                 </div>

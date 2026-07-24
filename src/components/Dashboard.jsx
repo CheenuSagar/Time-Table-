@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Calendar, MapPin, User, ArrowRight, AlertCircle, PlusCircle, Sparkles, BookOpen, BellRing, Layers, Coffee } from 'lucide-react';
+import { Clock, Calendar, MapPin, User, ArrowRight, AlertCircle, PlusCircle, Sparkles, BookOpen, BellRing, Layers, Coffee, RefreshCw } from 'lucide-react';
 import { formatTimeTo12Hr, isActualLecture } from '../utils/storageHelper';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -142,10 +142,12 @@ export default function Dashboard({ timetable, settings, onAddClick, onEditClick
     activeRemaining = end - currentMinutes;
   }
 
-  // Get Today's Timeline
+  // Get Today's Timeline & Substituted Lectures
   const todayClasses = timetable
     .filter((cls) => cls.day === currentDay)
     .sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+
+  const todaySubstitutedClasses = todayClasses.filter(cls => cls.substituteTeacher && isActualLecture(cls));
 
   return (
     <div className="dashboard-grid animate-fade-in">
@@ -199,6 +201,33 @@ export default function Dashboard({ timetable, settings, onAddClick, onEditClick
           </div>
         </div>
 
+        {/* Replacement Teacher Alert Banner for Students */}
+        {todaySubstitutedClasses.length > 0 && (
+          <div className="admin-card glass card-featured" style={{ borderColor: '#f43f5e', background: 'rgba(244, 63, 94, 0.08)', padding: '14px 18px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <RefreshCw size={22} style={{ color: '#f43f5e', flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <h4 style={{ margin: 0, fontSize: '0.96rem', fontWeight: 700, color: '#f43f5e' }}>
+                  📢 Faculty Replacement Alert ({todaySubstitutedClasses.length} Today)
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
+                  {todaySubstitutedClasses.map(c => (
+                    <div key={c.id} style={{ fontSize: '0.84rem', color: 'var(--text-primary)' }}>
+                      • <strong>{c.name}</strong> ({c.startTime} - {c.endTime}): 
+                      <span style={{ color: '#f43f5e', fontWeight: 700, marginLeft: '4px' }}>
+                        Prof. {c.substituteTeacher}
+                      </span> 
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', textDecoration: 'line-through', marginLeft: '4px' }}>
+                        (instead of {c.teacher})
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Warning Banner if class is starting soon */}
         {isClose && nextClass && (
           <div className="warning-banner animate-pulse-glow">
@@ -222,11 +251,17 @@ export default function Dashboard({ timetable, settings, onAddClick, onEditClick
               <div className="color-bar" style={{ backgroundColor: activeClass.color, boxShadow: `0 0 15px ${activeClass.color}` }}></div>
               <div className="active-details">
                 <h2 className="class-name">{activeClass.name}</h2>
-                <div className="metadata-row">
-                  {activeClass.teacher && (
-                    <span className="metadata-item">
-                      <User size={15} /> {activeClass.teacher}
+                <div className="metadata-row" style={{ flexWrap: 'wrap', gap: '10px' }}>
+                  {activeClass.substituteTeacher ? (
+                    <span className="metadata-item" style={{ color: '#f43f5e', fontWeight: 700, background: 'rgba(244, 63, 94, 0.12)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
+                      <RefreshCw size={14} /> Sub: {activeClass.substituteTeacher} <span style={{ textDecoration: 'line-through', opacity: 0.65, fontWeight: 400, fontSize: '0.78rem' }}>({activeClass.teacher})</span>
                     </span>
+                  ) : (
+                    activeClass.teacher && (
+                      <span className="metadata-item">
+                        <User size={15} /> {activeClass.teacher}
+                      </span>
+                    )
                   )}
                   {activeClass.location && (
                     <span className="metadata-item">
@@ -272,11 +307,17 @@ export default function Dashboard({ timetable, settings, onAddClick, onEditClick
                 <div className="next-header">
                   <h2 className="class-name">{nextClass.name}</h2>
                 </div>
-                <div className="metadata-row">
-                  {nextClass.teacher && (
-                    <span className="metadata-item">
-                      <User size={15} /> {nextClass.teacher}
+                <div className="metadata-row" style={{ flexWrap: 'wrap', gap: '10px' }}>
+                  {nextClass.substituteTeacher ? (
+                    <span className="metadata-item" style={{ color: '#f43f5e', fontWeight: 700, background: 'rgba(244, 63, 94, 0.12)', padding: '3px 8px', borderRadius: '4px', border: '1px solid rgba(244, 63, 94, 0.3)' }}>
+                      <RefreshCw size={14} /> Sub: {nextClass.substituteTeacher} <span style={{ textDecoration: 'line-through', opacity: 0.65, fontWeight: 400, fontSize: '0.78rem' }}>({nextClass.teacher})</span>
                     </span>
+                  ) : (
+                    nextClass.teacher && (
+                      <span className="metadata-item">
+                        <User size={15} /> {nextClass.teacher}
+                      </span>
+                    )
                   )}
                   {nextClass.location && (
                     <span className="metadata-item">
@@ -338,8 +379,14 @@ export default function Dashboard({ timetable, settings, onAddClick, onEditClick
                     </div>
                     <h4 className="timeline-title">{cls.name}</h4>
                     <div className="timeline-meta">
-                      {cls.teacher && <span>{cls.teacher}</span>}
-                      {cls.teacher && cls.location && <span className="separator">•</span>}
+                      {cls.substituteTeacher ? (
+                        <span style={{ color: '#f43f5e', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <RefreshCw size={12} /> Sub: {cls.substituteTeacher} <span style={{ textDecoration: 'line-through', opacity: 0.6, fontSize: '0.75rem', fontWeight: 400 }}>({cls.teacher})</span>
+                        </span>
+                      ) : (
+                        cls.teacher && <span>{cls.teacher}</span>
+                      )}
+                      {(cls.teacher || cls.substituteTeacher) && cls.location && <span className="separator">•</span>}
                       {cls.location && <span>{cls.location}</span>}
                     </div>
                     {isCurrent && <span className="badge badge-live live-pill">ONGOING</span>}
